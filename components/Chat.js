@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text, Button } from "react-native";
 import { useEffect } from "react";
+import { GiftedChat } from "react-native-gifted-chat";
 
 const Chat = ({ navigation, route }) => {
   const { name, bgColor } = route.params;
