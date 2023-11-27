@@ -48,6 +48,10 @@ const Start = ({ navigation }) => {
             >
               {/* This adds the "button" for each color */}
               <TouchableOpacity
+                accessible={true}
+                accessibilityLabel="Color Options"
+                accessibilityHint="Lets you choose which a background color for the chat screen."
+                accessibilityRole="button"
                 key={index}
                 style={[
                   styles.colorButton,
