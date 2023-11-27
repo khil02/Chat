@@ -43,6 +43,12 @@ const Chat = ({ navigation, route }) => {
       GiftedChat.append(previousMessages, newMessages)
     );
   };
+  //Gifted Chat example MUST import useCallback if using
+  // const onSend = useCallback((messages = []) => {
+  //   setMessages(previousMessages =>
+  //     GiftedChat.append(previousMessages, messages),
+  //   )
+  // }, [])
 
   const renderBubble = (props) => {
     return (
@@ -69,13 +75,6 @@ const Chat = ({ navigation, route }) => {
       />
     );
   };
-
-  //Gifted Chat example MUST import useCallback if using
-  // const onSend = useCallback((messages = []) => {
-  //   setMessages(previousMessages =>
-  //     GiftedChat.append(previousMessages, messages),
-  //   )
-  // }, [])
 
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
