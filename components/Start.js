@@ -20,16 +20,6 @@ const Start = ({ navigation }) => {
 
   const auth = getAuth();
 
-  // const signInUser = () => {
-  //   signInAnonymously(auth)
-  //     .then((result) => {
-  //       navigation.navigate("ShoppingLists", { userID: result.user.uid });
-  //       Alert.alert("Signed in Successfully!");
-  //     })
-  //     .catch((error) => {
-  //       Alert.alert("Unable to sign in, try later again.");
-  //     });
-
   //Checks if name is blank and navigates to Chat page
   const login = () => {
     name.length > 0
