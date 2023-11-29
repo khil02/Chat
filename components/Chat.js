@@ -7,13 +7,16 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { Bubble, GiftedChat } from "react-native-gifted-chat";
+import {
+  Bubble,
+  GiftedChat,
+  SystemMessage,
+  Day,
+} from "react-native-gifted-chat";
 import {
   collection,
-  getDocs,
   addDoc,
   onSnapshot,
-  where,
   query,
   orderBy,
 } from "firebase/firestore";
@@ -44,38 +47,11 @@ const Chat = ({ navigation, route, db }) => {
       if (unsubMessages) unsubMessages();
     };
   }, []);
-  //   setMessages([
-  //     {
-  //       _id: 1,
-  //       text: "Hello developer",
-  //       CreatedAt: new Date(),
-  //       user: {
-  //         _id: 2,
-  //         name: "React Native",
-  //         avatar: "https://placeimg.com/140/140/any",
-  //       },
-  //     },
-  //     {
-  //       _id: 2,
-  //       //{ name: name } + seems like should have added name, it didn't
-  //       text: "You have entered the chat",
-  //       createdAt: new Date(),
-  //       system: true,
-  //     },
-  //   ]);
-  // }, []);
 
   //sends and adds message to array
   const onSend = (newMessages) => {
     addDoc(collection(db, "messages"), newMessages[0]);
   };
-
-  //Gifted Chat example MUST import useCallback if using
-  // const onSend = useCallback((messages = []) => {
-  //   setMessages(previousMessages =>
-  //     GiftedChat.append(previousMessages, messages),
-  //   )
-  // }, [])
 
   const renderBubble = (props) => {
     return (
@@ -103,6 +79,18 @@ const Chat = ({ navigation, route, db }) => {
     );
   };
 
+  //Changes Time/date display color based on the background color
+  const renderDay = (props) => {
+    let sysText = bgColor == "#B9C6AE" ? "black" : "white";
+    return <Day {...props} textStyle={{ color: sysText }} />;
+  };
+
+  //Changes system message color based on the background color
+  const renderSystemMessage = (props) => {
+    let sysText = bgColor == "#B9C6AE" ? "black" : "white";
+    return <SystemMessage {...props} textStyle={{ color: sysText }} />;
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Message at top of page */}
@@ -115,6 +103,8 @@ const Chat = ({ navigation, route, db }) => {
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
+        renderDay={renderDay}
+        renderSystemMessage={renderSystemMessage}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,
@@ -123,11 +113,7 @@ const Chat = ({ navigation, route, db }) => {
       />
 
       {/* Adjust for keyboard on Andriod */}
-      {Platform.OS === "android" ? (
-        <KeyboardAvoidingView behavior="height" />
-      ) : null}
-      {/* duplicate, needs to be removed final release */}
-      {/* {Platform.OS === "android" && <KeyboardAvoidingView behavior="height" />} */}
+      {Platform.OS === "android" && <KeyboardAvoidingView behavior="height" />}
 
       {/* Adjusts for keyboard on ios */}
       {Platform.OS === "ios" && <KeyboardAvoidingView behavior="padding" />}
