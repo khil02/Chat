@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { useState } from "react";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const bgImage = require("../assets/Background-Image.png");
 
@@ -17,10 +18,33 @@ const Start = ({ navigation }) => {
   //color array for selecting Chat page background
   const bgColors = ["#090C08", "#474056", "#8A95A5", "#B9C6AE"];
 
+  const auth = getAuth();
+
+  // const signInUser = () => {
+  //   signInAnonymously(auth)
+  //     .then((result) => {
+  //       navigation.navigate("ShoppingLists", { userID: result.user.uid });
+  //       Alert.alert("Signed in Successfully!");
+  //     })
+  //     .catch((error) => {
+  //       Alert.alert("Unable to sign in, try later again.");
+  //     });
+
   //Checks if name is blank and navigates to Chat page
   const login = () => {
     name.length > 0
-      ? navigation.navigate("Chat", { name: name, bgColor: bgColor })
+      ? signInAnonymously(auth)
+          .then((result) => {
+            navigation.navigate("Chat", {
+              userID: result.user.uid,
+              name: name,
+              bgColor: bgColor,
+            });
+            Alert.alert("Signed in Successfully!");
+          })
+          .catch((error) => {
+            Alert.alert("Unable to sign in, try later again.");
+          })
       : Alert.alert("Please enter a username.");
   };
 

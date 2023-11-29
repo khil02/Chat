@@ -8,41 +8,68 @@ import {
 } from "react-native";
 import { useEffect, useState } from "react";
 import { Bubble, GiftedChat } from "react-native-gifted-chat";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  onSnapshot,
+  where,
+  query,
+  orderBy,
+} from "firebase/firestore";
 
-const Chat = ({ navigation, route }) => {
-  const { name, bgColor } = route.params;
+const Chat = ({ navigation, route, db }) => {
+  const { userID, name, bgColor } = route.params;
   const [messages, setMessages] = useState([]);
 
   //sets initial message and title of chat page
   useEffect(() => {
     navigation.setOptions({ title: name });
-    setMessages([
-      {
-        _id: 1,
-        text: "Hello developer",
-        CreatedAt: new Date(),
-        user: {
-          _id: 2,
-          name: "React Native",
-          avatar: "https://placeimg.com/140/140/any",
-        },
-      },
-      {
-        _id: 2,
-        //{ name: name } + seems like should have added name, it didn't
-        text: "You have entered the chat",
-        createdAt: new Date(),
-        system: true,
-      },
-    ]);
+    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+
+    const unsubMessages = onSnapshot(q, (docs) => {
+      let newMessages = [];
+      docs.forEach((doc) => {
+        newMessages.push({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: new Date(doc.data().createdAt.toMillis()),
+        });
+      });
+      setMessages(newMessages);
+    });
+
+    //clean up code
+    return () => {
+      if (unsubMessages) unsubMessages();
+    };
   }, []);
+  //   setMessages([
+  //     {
+  //       _id: 1,
+  //       text: "Hello developer",
+  //       CreatedAt: new Date(),
+  //       user: {
+  //         _id: 2,
+  //         name: "React Native",
+  //         avatar: "https://placeimg.com/140/140/any",
+  //       },
+  //     },
+  //     {
+  //       _id: 2,
+  //       //{ name: name } + seems like should have added name, it didn't
+  //       text: "You have entered the chat",
+  //       createdAt: new Date(),
+  //       system: true,
+  //     },
+  //   ]);
+  // }, []);
 
   //sends and adds message to array
   const onSend = (newMessages) => {
-    setMessages((previousMessages) =>
-      GiftedChat.append(previousMessages, newMessages)
-    );
+    addDoc(collection(db, "messages"), newMessages[0]);
   };
+
   //Gifted Chat example MUST import useCallback if using
   // const onSend = useCallback((messages = []) => {
   //   setMessages(previousMessages =>
@@ -90,7 +117,8 @@ const Chat = ({ navigation, route }) => {
         renderBubble={renderBubble}
         onSend={(messages) => onSend(messages)}
         user={{
-          _id: 1,
+          _id: userID,
+          name: name,
         }}
       />
 
