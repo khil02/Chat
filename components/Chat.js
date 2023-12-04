@@ -12,6 +12,7 @@ import {
   GiftedChat,
   SystemMessage,
   Day,
+  InputToolbar,
 } from "react-native-gifted-chat";
 import {
   collection,
@@ -20,33 +21,58 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Chat = ({ navigation, route, db }) => {
+const Chat = ({ navigation, route, db, isConnected }) => {
   const { userID, name, bgColor } = route.params;
   const [messages, setMessages] = useState([]);
 
+  //Declared for use in useEffect
+  let unsubMessages;
   //sets initial message and title of chat page
   useEffect(() => {
     navigation.setOptions({ title: name });
-    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+    //tests if connected to internet
+    if (isConnected === true) {
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
 
-    const unsubMessages = onSnapshot(q, (docs) => {
-      let newMessages = [];
-      docs.forEach((doc) => {
-        newMessages.push({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: new Date(doc.data().createdAt.toMillis()),
+      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+
+      unsubMessages = onSnapshot(q, (docs) => {
+        let newMessages = [];
+        docs.forEach((doc) => {
+          newMessages.push({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: new Date(doc.data().createdAt.toMillis()),
+          });
         });
+        cacheMessages(newMessages);
+        setMessages(newMessages);
       });
-      setMessages(newMessages);
-    });
+    } else loadCachedMessages();
 
     //clean up code
     return () => {
       if (unsubMessages) unsubMessages();
     };
-  }, []);
+  }, [isConnected]);
+
+  //Stores/Caches messages
+  const cacheMessages = async (messagesToCache) => {
+    try {
+      await AsyncStorage.setItem("messages", JSON.stringify(messagesToCache));
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  //Loads cached messages
+  const loadCachedMessages = async () => {
+    const storedMessages = (await AsyncStorage.getItem("messages")) || [];
+    setMessages(JSON.parse(storedMessages));
+  };
 
   //sends and adds message to array
   const onSend = (newMessages) => {
@@ -91,6 +117,11 @@ const Chat = ({ navigation, route, db }) => {
     return <SystemMessage {...props} textStyle={{ color: sysText }} />;
   };
 
+  const renderInputToolbar = (props) => {
+    if (isConnected) return <InputToolbar {...props} />;
+    else return null;
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: bgColor }]}>
       {/* Message at top of page */}
@@ -105,6 +136,7 @@ const Chat = ({ navigation, route, db }) => {
         renderBubble={renderBubble}
         renderDay={renderDay}
         renderSystemMessage={renderSystemMessage}
+        renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,
