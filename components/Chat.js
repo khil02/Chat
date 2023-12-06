@@ -5,6 +5,7 @@ import {
   Button,
   Platform,
   KeyboardAvoidingView,
+  TouchableOpacity,
 } from "react-native";
 import { useEffect, useState } from "react";
 import {
@@ -22,13 +23,15 @@ import {
   orderBy,
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { Audio } from "expo-av";
 import CustomActions from "./CustomActions";
 import MapView from "react-native-maps";
+import { async } from "@firebase/util";
 
 const Chat = ({ navigation, route, db, isConnected, storage }) => {
   const { userID, name, bgColor } = route.params;
   const [messages, setMessages] = useState([]);
+  let soundObject = null;
 
   //Declared for use in useEffect
   let unsubMessages;
@@ -59,6 +62,7 @@ const Chat = ({ navigation, route, db, isConnected, storage }) => {
     //clean up code
     return () => {
       if (unsubMessages) unsubMessages();
+      if (soundObject) soundObject.unloadAsync();
     };
   }, [isConnected]);
 
@@ -129,6 +133,29 @@ const Chat = ({ navigation, route, db, isConnected, storage }) => {
     return <CustomActions storage={storage} userID={userID} {...props} />;
   };
 
+  const renderAudioBubble = (props) => {
+    return (
+      <View {...props}>
+        <TouchableOpacity
+          style={{ backgroundColor: "#FF0", borderRadius: 10, margin: 5 }}
+          onPress={async () => {
+            if (soundObject) soundObject.unloadAsync();
+            const { sound } = await Audio.Sound.createAsync({
+              uri: props.currentMessage.audio,
+            });
+
+            soundObject = sound;
+            await sound.playAsync();
+          }}
+        >
+          <Text style={{ textAlign: "center", color: "black", padding: 5 }}>
+            Play Sound
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   const renderCustomView = (props) => {
     const { currentMessage } = props;
     if (currentMessage.location) {
@@ -169,6 +196,7 @@ const Chat = ({ navigation, route, db, isConnected, storage }) => {
         renderInputToolbar={renderInputToolbar}
         renderActions={renderCustomActions}
         renderCustomView={renderCustomView}
+        renderMessageAudio={renderAudioBubble}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,
