@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, LogBox } from "react-native";
+import { StyleSheet, Text, View, LogBox, Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { initializeApp } from "firebase/app";
@@ -8,6 +8,7 @@ import {
   enableNetwork,
   disableNetwork,
 } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useEffect } from "react";
 
@@ -20,6 +21,9 @@ const Stack = createNativeStackNavigator();
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 export default function App() {
+  // Used to check if app is online or offline
+  const connectionStatus = useNetInfo();
+
   useEffect(() => {
     if (connectionStatus.isConnected === false) {
       Alert.alert("Connection lost!");
@@ -39,9 +43,7 @@ export default function App() {
   };
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-
-  // Used to check if app is online or offline
-  const connectionStatus = useNetInfo();
+  const storage = getStorage(app);
 
   return (
     <NavigationContainer>
@@ -52,6 +54,7 @@ export default function App() {
             <Chat
               isConnected={connectionStatus.isConnected}
               db={db}
+              storage={storage}
               {...props}
             />
           )}
