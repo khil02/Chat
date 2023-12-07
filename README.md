@@ -29,3 +29,4 @@
 3. Use `expo start` to start the development server
 4. If using an Android emulator, press a to open the app on the emulator.
 5. If using a mobile device, install the Expo Go app from the app store and either scan the QR code or manually enter the web address.
+6. If setting up for personal use, update `firebaseConfig` in `App.js` with your own Firebase `Config` keys
