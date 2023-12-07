@@ -30,7 +30,6 @@ const Start = ({ navigation }) => {
               name: name,
               bgColor: bgColor,
             });
-            //Alert.alert("Signed in Successfully!");
           })
           .catch((error) => {
             Alert.alert("Unable to sign in, try later again.");
@@ -67,12 +66,7 @@ const Start = ({ navigation }) => {
                 accessibilityHint="Lets you choose which a background color for the chat screen."
                 accessibilityRole="button"
                 key={index}
-                style={[
-                  styles.colorButton,
-                  { backgroundColor: color },
-                  //This tests for adding a border on the button itself NOT CURRENTLY USED
-                  //bgColor === color && styles.selected,
-                ]}
+                style={[styles.colorButton, { backgroundColor: color }]}
                 onPress={() => setBgColor(color)}
               />
             </View>

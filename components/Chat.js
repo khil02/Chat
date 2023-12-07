@@ -26,7 +26,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
 import CustomActions from "./CustomActions";
 import MapView from "react-native-maps";
-import { async } from "@firebase/util";
+//import { async } from "@firebase/util";
 
 const Chat = ({ navigation, route, db, isConnected, storage }) => {
   const { userID, name, bgColor } = route.params;
@@ -86,6 +86,7 @@ const Chat = ({ navigation, route, db, isConnected, storage }) => {
     addDoc(collection(db, "messages"), newMessages[0]);
   };
 
+  //Message bubble configurations
   const renderBubble = (props) => {
     return (
       <Bubble
@@ -128,7 +129,7 @@ const Chat = ({ navigation, route, db, isConnected, storage }) => {
     if (isConnected) return <InputToolbar {...props} />;
     else return null;
   };
-
+  // renders photo/location options
   const renderCustomActions = (props) => {
     return <CustomActions storage={storage} userID={userID} {...props} />;
   };
@@ -155,7 +156,7 @@ const Chat = ({ navigation, route, db, isConnected, storage }) => {
       </View>
     );
   };
-
+  // Render map for location sharing
   const renderCustomView = (props) => {
     const { currentMessage } = props;
     if (currentMessage.location) {
@@ -222,7 +223,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "Center",
-    //alignItems: "center",
   },
 });
 

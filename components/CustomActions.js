@@ -1,11 +1,10 @@
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import * as ImagePicker from "expo-image-picker";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import * as Location from "expo-location";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Audio } from "expo-av";
-import { async } from "@firebase/util";
 
 const CustomActions = ({
   wrapperStyle,
@@ -22,13 +21,13 @@ const CustomActions = ({
       if (recordingObject) recordingObject.stopAndUnloadAsync();
     };
   }, []);
-
+  // Makes reference for photos being uploaded
   const generateReference = (uri) => {
     const timeStamp = new Date().getTime();
     const imageName = uri.split("/")[uri.split("/").length - 1];
     return `${userID}-${timeStamp}-${imageName}`;
   };
-
+  //Start recording
   const startRecording = async () => {
     try {
       let permissions = await Audio.requestPermissionsAsync();
@@ -70,7 +69,7 @@ const CustomActions = ({
       Alert.alert("Failed to record!");
     }
   };
-
+  // Cancel recording, does not send
   const stopRecording = async () => {
     await Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
@@ -78,7 +77,7 @@ const CustomActions = ({
     });
     await recordingObject.stopAndUnloadAsync();
   };
-
+  // stop and send recording
   const sendRecordedSound = async () => {
     await stopRecording();
     const uniqueRefString = generateReference(recordingObject.getURI());
@@ -90,7 +89,7 @@ const CustomActions = ({
       onSend({ audio: soundURL });
     });
   };
-
+  // uploads photo to cloud storage and sends image message into chat
   const uploadAndSendImage = async (imageURI) => {
     const uniqueRefString = generateReference(imageURI);
     const newUploadRef = ref(storage, uniqueRefString);
@@ -101,7 +100,7 @@ const CustomActions = ({
       onSend({ image: imageURL });
     });
   };
-
+  // select image from media library
   const pickImage = async () => {
     let permissions = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -111,7 +110,7 @@ const CustomActions = ({
       else Alert.alert("Permissions to view photo library haven't granted");
     }
   };
-
+  // accesses phone camera to take photo
   const takePhoto = async () => {
     let permissions = await ImagePicker.requestCameraPermissionsAsync();
 
@@ -122,7 +121,7 @@ const CustomActions = ({
       else Alert.alert("Permissions to camera haven't granted");
     }
   };
-
+  //Gets location
   const getLocation = async () => {
     let permissions = await Location.requestForegroundPermissionsAsync();
 
@@ -140,7 +139,7 @@ const CustomActions = ({
       Alert.alert("Permissions to read location aren't granted");
     }
   };
-
+  // Custom action menu
   const onActionPress = () => {
     const options = [
       "Choose From Library",

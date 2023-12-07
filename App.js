@@ -1,5 +1,4 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, LogBox, Alert } from "react-native";
+import { StyleSheet, LogBox, Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { initializeApp } from "firebase/app";
@@ -18,7 +17,7 @@ import Chat from "./components/Chat";
 
 //create the navigator
 const Stack = createNativeStackNavigator();
-LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+LogBox.ignoreLogs(["AsyncStorage has been extracted from", "@firebase/auth"]);
 
 export default function App() {
   // Used to check if app is online or offline
@@ -33,6 +32,7 @@ export default function App() {
     }
   }, [connectionStatus.isConnected]);
 
+  //Authentication
   const firebaseConfig = {
     apiKey: "AIzaSyBfnD98z8mzbVIEnX1CWJLyxLsqqOQRcAw",
     authDomain: "chat-demo-7111f.firebaseapp.com",
