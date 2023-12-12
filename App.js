@@ -32,7 +32,7 @@ export default function App() {
     }
   }, [connectionStatus.isConnected]);
 
-  //Authentication
+  //Database authentication
   const firebaseConfig = {
     apiKey: "AIzaSyBfnD98z8mzbVIEnX1CWJLyxLsqqOQRcAw",
     authDomain: "chat-demo-7111f.firebaseapp.com",
